@@ -1,0 +1,21 @@
+{
+  "appTitle": "TradeQuest",
+  "appTitlePart1": "Trade",
+  "appTitlePart2": "Quest",
+  "heroSubtitle": "Maîtrisez la simulation.\nAméliorez votre portefeuille réel.",
+  "loginWithGoogle": "Se connecter avec Google",
+  "secureAuth": "Authentification sécurisée par Google",
+  "footerByContinuing": "En continuant, vous acceptez les ",
+  "footerTerms": "Conditions d'utilisation",
+  "footerAnd": " et la ",
+  "footerPrivacy": "Politique de confidentialité",
+  
+  "startMission": "Commencer la Mission 🚀",
+  "alreadyAgent": "Déjà agent ? Connexion",
+  "missionControl": "Contrôle de Mission",
+  "selectMission": "Choisir une Mission",
+  "systemOnline": "SYSTÈME EN LIGNE",
+  "searchPlaceholder": "Rechercher sujets, mots-clés...",
+  "level": "Niv",
+  "locked": "VERROUILLÉ"
+}

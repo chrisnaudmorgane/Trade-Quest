@@ -1,0 +1,21 @@
+{
+  "appTitle": "TradeQuest",
+  "appTitlePart1": "Trade",
+  "appTitlePart2": "Quest",
+  "heroSubtitle": "Master the simulation.\nLevel up your real-world portfolio.",
+  "loginWithGoogle": "Log in with Google",
+  "secureAuth": "Secure authentication powered by Google",
+  "footerByContinuing": "By continuing, you agree to TradeQuest's ",
+  "footerTerms": "Terms of Service",
+  "footerAnd": " and ",
+  "footerPrivacy": "Privacy Policy",
+  
+  "startMission": "Start Mission 🚀",
+  "alreadyAgent": "Already an agent? Log in",
+  "missionControl": "Mission Control",
+  "selectMission": "Select Mission",
+  "systemOnline": "SYSTEM ONLINE",
+  "searchPlaceholder": "Search topics, keywords...",
+  "level": "Lvl",
+  "locked": "LOCKED"
+}
