@@ -71,21 +71,42 @@ class LessonContentView extends StatelessWidget {
             flex: 3,
             child: Container(
               width: double.infinity,
-              decoration: BoxDecoration(
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                color: const Color(0xFF182b34),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
-                image: screen.visualDescription != null ? DecorationImage(
-                  image: NetworkImage(
-                    'https://image.pollinations.ai/prompt/${Uri.encodeComponent(screen.visualDescription!)}',
-                  ),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
-                ) : null,
+                child: screen.visualDescription != null 
+                  ? Image.network(
+                      'https://image.pollinations.ai/prompt/${Uri.encodeComponent(screen.visualDescription!)}',
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container( // Fallback if 502/Error
+                          color: const Color(0xFF182b34), 
+                          child: const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.broken_image, size: 32, color: Colors.white24),
+                                SizedBox(height: 8),
+                                Text("Visual unavailable", style: TextStyle(color: Colors.white24, fontSize: 10))
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: const Color(0xFF182b34),
+                          child: const Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2)),
+                        );
+                      },
+                    )
+                  : Container( // Fallback if no visual description
+                      color: const Color(0xFF182b34),
+                      child: const Center(child: Icon(Icons.image_not_supported, size: 48, color: Colors.white24)),
+                    ),
               ),
-              child: screen.visualDescription == null ? const Center(
-                child: Icon(Icons.image_not_supported, size: 48, color: Colors.white24),
-              ) : null,
             ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
           ),
 

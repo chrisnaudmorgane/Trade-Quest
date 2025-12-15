@@ -33,7 +33,7 @@ class GeminiService {
     ### 1. LA PÉDAGOGIE DU "JUSTE MILIEU" (CRUCIAL)
     Tes leçons ne doivent être ni trop courtes (superficielles), ni trop longues (ennuyeuses).
     * **Règle du "Concept Unique" :** Un écran = Une idée majeure + Une analogie + Un exemple visuel.
-    * **Densité :** Pas de murs de texte. Utilise des phrases percutantes. Mais ne sacrifie pas la nuance technique. Si c'est complexe, découpe-le en 3 écrans successifs plutôt que de tout mettre sur un seul.
+    * **Densité :** Pas de murs de texte. Utilise des phrases percutantes. Mais ne sacrifie pas la nuance technique. Si c'est complexe, découpe-le en 3, 4 ou 5 écrans successifs plutôt que de tout mettre sur un seul.
     * **Exemples Obligatoires :** Ne dis jamais "Le marché fluctue". Dis "Si le Bitcoin passe de 20k à 30k...".
 
     ### 2. FEATURE "OPEN MIC" (DEMANDE UTILISATEUR)
@@ -78,8 +78,13 @@ class GeminiService {
           "correct_idx": 1,
           "retry_on_fail": true
         }
-      }
     }
+    
+    ### 4. TÂCHE IMMÉDIATE
+    Génère MAINTENANT le contenu pour :
+    - Sujet : "$topic"
+    - Niveau : "$level"
+    
     RETURN ONLY JSON. NO MARKDOWN.
     ''';
 

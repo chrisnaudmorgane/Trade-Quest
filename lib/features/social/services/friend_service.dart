@@ -52,21 +52,17 @@ class FriendService {
     if (uid == null) return [];
 
     try {
-      // Assuming a 'friendships' table exists: 
-      // id, user_id, friend_id, status
-      // We need to fetch profiles of friends. 
-      // This is a complex join. For simplicity, we might query friendships then profiles.
-      
-      // 1. Get confirmed friend IDs
       final friendships = await _client
           .from('friendships')
-          .select('friend_id')
-          .eq('user_id', uid)
+          .select('requester_id, receiver_id')
+          .or('requester_id.eq.$uid,receiver_id.eq.$uid')
           .eq('status', 'accepted');
 
-      final List<String> friendIds = (friendships as List)
-          .map((f) => f['friend_id'] as String)
-          .toList();
+      final List<String> friendIds = (friendships as List).map((f) {
+        final req = f['requester_id'] as String;
+        final rec = f['receiver_id'] as String;
+        return req == uid ? rec : req;
+      }).toList();
 
       if (friendIds.isEmpty) return [];
 

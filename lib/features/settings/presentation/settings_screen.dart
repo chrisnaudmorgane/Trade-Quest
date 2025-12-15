@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trade_quest/core/theme/app_colors.dart';
 import '../../../../core/services/supabase_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -167,25 +169,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         ]),
                         const SizedBox(height: 24),
-                        _buildSectionHeader('App Preferences'),
-                        const SizedBox(height: 12),
-                        _buildSettingsGroup([
-                          _buildSettingsTile(
-                            icon: Icons.palette,
-                            title: 'Theme',
-                            trailing: Text(
-                              'CYBERPUNK',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                            onTap: () {},
-                          ),
-                        ]),
-                        const SizedBox(height: 24),
+
                         _buildSectionHeader('Help & Support'),
                         const SizedBox(height: 12),
                         _buildSettingsGroup([
@@ -194,27 +178,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             title: 'Support Center',
                             iconColor: const Color(0xFFA0AEC0),
                             trailingIcon: Icons.open_in_new,
-                            onTap: () {},
+                            onTap: () async {
+                              final Uri emailLaunchUri = Uri(
+                                scheme: 'mailto',
+                                path: 'agossou@chrisnaud.com',
+                                queryParameters: {
+                                  'subject': 'Trade Quest Support Request',
+                                  'body': 'Describe your issue here...'
+                                },
+                              );
+                              if (await canLaunchUrl(emailLaunchUri)) {
+                                await launchUrl(emailLaunchUri);
+                              }
+                            },
                           ),
                           _buildSettingsTile(
                             icon: Icons.policy,
                             title: 'Privacy & Terms',
                             iconColor: const Color(0xFFA0AEC0),
-                            onTap: () {},
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: const Color(0xFF16262E),
+                                  title: const Text('Privacy Policy', style: TextStyle(color: Colors.white)),
+                                  content: const SingleChildScrollView(
+                                    child: Text(
+                                      "We respect your privacy.\n\n"
+                                      "1. Data Collection: We collect your email and username for authentication and gamification (Leaderboards, XP).\n"
+                                      "2. AI Usage: Your 'Open Mic' topics are sent to Gemini AI for lesson generation. No personal data is shared with AI.\n"
+                                      "3. Analytics: We track lesson completion to improve the learning path.\n\n"
+                                      "Contact agossou@chrisnaud.com for data deletion requests.",
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Close', style: TextStyle(color: AppColors.primary)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ]),
                         const SizedBox(height: 24),
                         _buildLogoutButton(context),
                         const SizedBox(height: 16),
-                        Text(
-                          'VERSION 2.4.0-CYBER',
-                          style: TextStyle(
-                            color: const Color(0xFF64748B),
-                            fontSize: 10,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+
                         const SizedBox(height: 32),
                       ],
                     ),

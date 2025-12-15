@@ -119,7 +119,7 @@ class SupabaseService {
       // Example query - adjust based on actual schema
       final response = await client
           .from('profiles')
-          .select('id, username, avatar_url, xp, rank')
+          .select('id, username, avatar_url, xp')
           .order('xp', ascending: false)
           .limit(50);
       return List<Map<String, dynamic>>.from(response);
@@ -137,6 +137,14 @@ class SupabaseService {
 
       if (category != null && category != 'All Quests') {
         query = query.eq('category', category);
+      }
+      
+      // Privacy Logic: Show public quests (user_id is null) OR my quests
+      final user = currentUser;
+      if (user != null) {
+        query = query.or('user_id.is.null,user_id.eq.${user.id}');
+      } else {
+        query = query.filter('user_id', 'is', null);
       }
 
       final response = await query.order('created_at', ascending: false);
@@ -163,7 +171,7 @@ class SupabaseService {
         'quest_id': questId,
         'status': 'completed',
         'completed_at': DateTime.now().toIso8601String(),
-        'earned_xp': xp,
+        // 'earned_xp': xp, // Removed: Column does not exist
       });
 
       // 2. Update user XP
@@ -171,6 +179,41 @@ class SupabaseService {
       
     } catch (e) {
       print('Error completing quest: $e');
+    }
+  }
+
+  Future<String?> createCustomQuest(String title) async {
+    try {
+      final response = await client.from('quests').insert({
+        'title': title,
+        'subtitle': 'Custom Request',
+        'tag': 'Entrepreneur', 
+        'xp': 150,
+        'icon': 'brain',
+        'description': 'AI Generated Custom Lesson',
+        'category': 'Custom',
+        'language': 'fr',
+        'user_id': client.auth.currentUser?.id
+      }).select().single();
+      
+      return response['id'] as String;
+    } catch (e) {
+      print('Error creating custom quest: $e');
+      return null;
+    }
+  }
+
+  Future<Set<String>> getCompletedQuestIds(String userId) async {
+    try {
+      final response = await client
+          .from('user_quests')
+          .select('quest_id')
+          .eq('user_id', userId)
+          .eq('status', 'completed');
+      
+      return (response as List).map((e) => e['quest_id'] as String).toSet();
+    } catch (e) {
+      return {};
     }
   }
 

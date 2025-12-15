@@ -260,7 +260,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 ),
-                child: const Text('RETURN TO BASE', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('RETURN TO BASE', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ],
           ),
