@@ -66,12 +66,26 @@ class SupabaseService {
     required String userId,
     String? username,
     String? avatarUrl,
+    String? country,
+    String? phoneNumber,
+    String? knowledgeLevel,
+    List<String>? interests,
+    String? incomeRange,
+    String? financialGoal,
+    String? fcmToken,
   }) async {
     final updates = {
       'id': userId,
       'updated_at': DateTime.now().toIso8601String(),
       if (username != null) 'username': username,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (country != null) 'country': country,
+      if (phoneNumber != null) 'phone_number': phoneNumber,
+      if (knowledgeLevel != null) 'knowledge_level': knowledgeLevel,
+      if (interests != null) 'interests': interests,
+      if (incomeRange != null) 'income_range': incomeRange,
+      if (financialGoal != null) 'financial_goal': financialGoal,
+      if (fcmToken != null) 'fcm_token': fcmToken,
     };
     await client.from('profiles').upsert(updates);
   }

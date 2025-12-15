@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/gemini_service.dart';
+import 'core/providers/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +25,13 @@ void main() async {
   runApp(const ProviderScope(child: TradeQuestApp()));
 }
 
-class TradeQuestApp extends StatelessWidget {
+class TradeQuestApp extends ConsumerWidget {
   const TradeQuestApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
+    
     return MaterialApp.router(
       title: 'Trade Quest',
       theme: AppTheme.darkTheme,
@@ -44,6 +47,7 @@ class TradeQuestApp extends StatelessWidget {
         Locale('en'), // English
         Locale('fr'), // French
       ],
+      locale: locale,
     );
   }
 }

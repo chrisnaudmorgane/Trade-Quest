@@ -52,9 +52,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectMission => 'Select Mission';
 
   @override
-  String get systemOnline => 'SYSTEM ONLINE';
-
-  @override
   String get searchPlaceholder => 'Search topics, keywords...';
 
   @override

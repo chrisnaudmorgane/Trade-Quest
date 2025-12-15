@@ -52,9 +52,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get selectMission => 'Choisir une Mission';
 
   @override
-  String get systemOnline => 'SYSTÈME EN LIGNE';
-
-  @override
   String get searchPlaceholder => 'Rechercher sujets, mots-clés...';
 
   @override

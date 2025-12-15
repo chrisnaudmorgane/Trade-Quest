@@ -182,12 +182,6 @@ abstract class AppLocalizations {
   /// **'Select Mission'**
   String get selectMission;
 
-  /// No description provided for @systemOnline.
-  ///
-  /// In en, this message translates to:
-  /// **'SYSTEM ONLINE'**
-  String get systemOnline;
-
   /// No description provided for @searchPlaceholder.
   ///
   /// In en, this message translates to:

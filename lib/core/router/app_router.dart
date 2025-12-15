@@ -2,6 +2,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/welcome_screen.dart';
+import '../../features/onboarding/presentation/onboarding_profile_screen.dart';
+import '../../features/solver/presentation/solver_screen.dart';
 import '../../features/dashboard/presentation/home_screen.dart';
 import '../../features/lesson/presentation/lesson_engine_screen.dart';
 import '../../features/dashboard/presentation/dashboard_shell.dart';
@@ -59,6 +61,10 @@ final appRouter = GoRouter(
       ],
     ),
     GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingProfileScreen(),
+    ),
+    GoRoute(
       path: '/lesson',
       builder: (context, state) {
          final topic = state.uri.queryParameters['topic'];
@@ -70,6 +76,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/solver',
+      builder: (context, state) => const SolverScreen(),
     ),
   ],
 );

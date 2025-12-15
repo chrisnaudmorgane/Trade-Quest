@@ -43,6 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
           _profile = profile;
           _completedQuestIds = completedIds;
         });
+
+        // Progressive Profiling: Check if Onboarding (Knowledge Level) is missing
+        if (profile != null && profile['knowledge_level'] == null) {
+          context.go('/onboarding');
+        }
       }
     }
   }
@@ -318,32 +323,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.neonGreen,
-                                  shape: BoxShape.circle,
-                                ),
-                              ).animate(onPlay: (c) => c.repeat(reverse: true)).fade(duration: 1000.ms),
-                              const SizedBox(width: 8),
-                              Text(
-                                l10n.systemOnline,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                     ),
-                      
-                      // User Avatar & Level
+                    
+                    GestureDetector(
+                      onTap: () => context.push('/solver'),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.neonBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.neonBlue.withOpacity(0.3)),
+                        ),
+                        child: const Icon(Icons.calculate, color: AppColors.neonBlue, size: 24),
+                      ),
+                    ),
+
                       GestureDetector(
                         onTap: () => context.go('/profile'),
                         child: Container(
@@ -394,47 +391,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 
-                // 2. Search Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.1)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 15,
-                        )
-                      ],
-                    ),
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: l10n.searchPlaceholder,
-                        hintStyle: TextStyle(color: AppColors.textSecondary),
-                        prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(Icons.tune, size: 20, color: AppColors.textSecondary),
-                          ),
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-                ),
-
-                // 3. Filter Chips
                 SizedBox(
                   height: 60,
                   child: ListView(
