@@ -138,9 +138,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildGlassIconButton(Icons.arrow_back, () => context.pop()),
+          // Back button removed
           Text(
             'LEADERBOARD',
             style: TextStyle(
@@ -153,7 +153,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
               ],
             ),
           ),
-          _buildGlassIconButton(Icons.info_outline, () {}),
+          // Info button removed
         ],
       ),
     );

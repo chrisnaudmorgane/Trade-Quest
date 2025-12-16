@@ -6,13 +6,22 @@ import '../../../../core/theme/app_colors.dart';
 import '../domain/lesson_models.dart';
 import 'views/lesson_content_view.dart';
 import 'views/lesson_quiz_view.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class LessonEngineScreen extends StatefulWidget {
-  final String? topic;
-  final String? level;
+  final String topic;
+  final String level;
   final String questId; // Required for completion tracking
-  
-  const LessonEngineScreen({super.key, this.topic, this.level, required this.questId});
+  final int xpReward;
+
+  const LessonEngineScreen({
+    super.key, 
+    required this.topic, 
+    required this.level, 
+    required this.questId,
+    required this.xpReward,
+  });
 
   @override
   State<LessonEngineScreen> createState() => _LessonEngineScreenState();
@@ -121,14 +130,88 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
   Future<void> _completeLesson() async {
       setState(() => _isCompleted = true);
       
+      // Play Success Sound
+      final player = AudioPlayer();
+      // Note: User needs to add assets/sounds/success.mp3
+      try {
+        await player.play(AssetSource('sounds/success_quest.mp3'));
+      } catch (e) {
+        print('Audio error: $e'); 
+        // Fail silently if asset missing
+      }
+
       final user = SupabaseService().currentUser;
       if (user != null) {
-        await SupabaseService().completeQuest(
+        final newBadges = await SupabaseService().completeQuest(
           user.id, 
           widget.questId, 
-          _lessonContent?.xpReward ?? 100
+          widget.xpReward,
         );
+        
+        if (newBadges.isNotEmpty) {
+           // Queue badge animations
+           for (final badge in newBadges) {
+             if (mounted) _showBadgeDialog(badge);
+             await Future.delayed(const Duration(milliseconds: 2000)); // Wait before showing next or finishing
+           }
+        }
       }
+  }
+
+  void _showBadgeDialog(Map<String, dynamic> badge) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E293B),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.neonRoot, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.neonRoot.withOpacity(0.5),
+                blurRadius: 30,
+                spreadRadius: 5,
+              )
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text("NEW BADGE UNLOCKED!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              const SizedBox(height: 24),
+              Icon(Icons.military_tech, size: 80, color: Color(int.parse(badge['color_hex'] ?? '0xFFFFC107'))).animate().scale(duration: 600.ms, curve: Curves.elasticOut).then().shimmer(),
+              const SizedBox(height: 16),
+              Text(
+                badge['name'] ?? 'Unknown Badge',
+                style: const TextStyle(color: AppColors.neonRoot, fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                badge['description'] ?? 'You are a legend.',
+                style: const TextStyle(color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+               ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.neonRoot),
+                child: const Text("CLAIM REWARD", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              )
+            ],
+          ),
+        ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+      ),
+    );
+    
+    // Play Badge Sound
+    final player = AudioPlayer();
+    try {
+       player.play(AssetSource('sounds/badge_unlock.mp3'));
+    } catch (_) {}
   }
 
   void _previousPage() {
@@ -250,7 +333,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '+${_lessonContent?.xpReward ?? 100} XP',
+                '+${widget.xpReward} XP',
                 style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 40),

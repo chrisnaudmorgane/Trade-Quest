@@ -469,6 +469,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                    description: q['description'] ?? 'No intel available.',
                                    questId: q['id'] ?? 'unknown',
                                    isCompleted: _completedQuestIds.contains(q['id'] ?? ''),
+                                   isLocked: _isQuestLocked(q),
                                  ).animate().fadeIn().slideX();
                               }).toList(),
                             ),
@@ -528,6 +529,22 @@ class _HomeScreenState extends State<HomeScreen> {
     if (name == 'building') return Icons.apartment;
     if (name == 'briefcase') return Icons.work;
     return Icons.token;
+  }
+
+  bool _isQuestLocked(Map<String, dynamic> quest) {
+    if (_profile == null) return true; // Lock if profile not loaded
+    
+    final int userXp = _profile!['xp'] as int? ?? 0;
+    final String tag = quest['tag'] ?? 'Beginner';
+    
+    // Simple progression logic
+    if (tag == 'Beginner') return false;
+    if (tag == 'Intermediate') return userXp < 300;
+    if (tag == 'Expert') return userXp < 1000;
+    if (tag == 'Entrepreneur') return userXp < 2000;
+    if (tag == 'Legendary') return userXp < 5000;
+    
+    return false;
   }
 
   Widget _buildChip(String label, {bool isActive = false, VoidCallback? onTap}) {
@@ -663,7 +680,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         GestureDetector(
                           onTap: () async {
-                            await context.push('/lesson?topic=${quest['title']}&level=${quest['tag']}&questId=${quest['id']}');
+                            await context.push('/lesson?topic=${quest['title']}&level=${quest['tag']}&questId=${quest['id']}&xpReward=${quest['xp'] ?? 100}');
                              // Refresh data when finding back
                             _loadProfile();
                             _fetchQuests();
@@ -739,7 +756,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return GestureDetector(
       onTap: (isLocked || isCompleted) ? null : () async {
-        await context.push('/lesson?topic=${Uri.encodeComponent(title)}&level=${Uri.encodeComponent(tag)}&questId=$questId');
+        if (isLocked) return; // double check
+        await context.push('/lesson?topic=${Uri.encodeComponent(title)}&level=${Uri.encodeComponent(tag)}&questId=$questId&xpReward=$xp');
         // Refresh data when returning
         _loadProfile();
         _fetchQuests();
@@ -748,7 +766,7 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF162229),
+          color: const Color(0xFF162229).withOpacity(isLocked ? 0.5 : 1.0),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
              color: isCompleted ? AppColors.neonGreen.withOpacity(0.5) : Colors.white.withOpacity(0.05)
@@ -777,7 +795,11 @@ class _HomeScreenState extends State<HomeScreen> {
                        color: isCompleted ? AppColors.neonGreen.withOpacity(0.2) : tagColor.withOpacity(0.2)
                     ),
                   ),
-                  child: Icon(isCompleted ? Icons.check : icon, color: isCompleted ? AppColors.neonGreen : tagColor, size: 24),
+                  child: Icon(
+                    isLocked ? Icons.lock : (isCompleted ? Icons.check : icon), 
+                    color: isLocked ? Colors.grey : (isCompleted ? AppColors.neonGreen : tagColor), 
+                    size: 24
+                  ),
                 ),
                 const SizedBox(width: 12),
                 

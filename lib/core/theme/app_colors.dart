@@ -18,6 +18,7 @@ class AppColors {
   static const Color neonPurple = Color(0xFFBC13FE); 
   static const Color neonGreen = Color(0xFF34A853); // Google Green
   static const Color neonRed = Color(0xFFEA4335); // Google Red
+  static const Color neonRoot = Color(0xFFFFC107); // Gold/Amber for Badges
   static const Color background = backgroundDark;
   static const Color surface = cardDark;
   static const Color surfaceGlass = Color(0xCC182830);

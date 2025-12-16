@@ -8,9 +8,11 @@ import 'core/router/app_router.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/gemini_service.dart';
 import 'core/providers/locale_provider.dart';
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = MyHttpOverrides();
   
   // Initialize Services
   // TODO: Replace with your actual Supabase URL and Anon Key
@@ -49,5 +51,13 @@ class TradeQuestApp extends ConsumerWidget {
       ],
       locale: locale,
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

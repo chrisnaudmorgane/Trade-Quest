@@ -278,10 +278,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-             onPressed: () {}, // Menu
-             icon: const Icon(Icons.menu, color: Colors.white70),
-          ),
+          // Hamburger menu removed
+          const SizedBox(width: 48), // Spacer to balance Settings button if we want centering, or just remove. 
+          // Actually, let's just use SizedBox to trigger "Start/End" with spaceBetween correctly or just remove. 
+          // User said "remove", I will replace with SizedBox.shrink() or just empty. 
+          // Let's replace with empty and let alignment happen, or better, keep the layout balanced?
+          // I will replace with a SizedBox(width: 48) to keep the text centered if possible, assuming the right icon is 48.
+          // Standard IconButton is 48x48 usually.
+          const SizedBox(width: 48),
           Column(
             children: [
               Text(

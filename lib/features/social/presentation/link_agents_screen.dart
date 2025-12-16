@@ -108,9 +108,9 @@ class _LinkAgentsScreenState extends State<LinkAgentsScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildGlassIconButton(Icons.arrow_back, () => context.pop()),
+          // Back button removed
           Text(
             'LINK AGENTS',
             style: GoogleFonts.spaceGrotesk(
@@ -120,7 +120,7 @@ class _LinkAgentsScreenState extends State<LinkAgentsScreen> {
               letterSpacing: 2,
             ),
           ),
-          _buildGlassIconButton(Icons.qr_code_scanner, () {}),
+          // Scan button removed
         ],
       ),
     );

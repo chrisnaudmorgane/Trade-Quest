@@ -177,7 +177,7 @@ class SupabaseService {
     }
   }
 
-  Future<void> completeQuest(String userId, String questId, int xp) async {
+  Future<List<Map<String, dynamic>>> completeQuest(String userId, String questId, int xp) async {
     try {
       // 1. Insert into user_quests
       await client.from('user_quests').insert({
@@ -185,14 +185,17 @@ class SupabaseService {
         'quest_id': questId,
         'status': 'completed',
         'completed_at': DateTime.now().toIso8601String(),
-        // 'earned_xp': xp, // Removed: Column does not exist
       });
 
       // 2. Update user XP
       await updateUserXp(userId, xp);
+
+      // 3. Check for Badges
+      return await checkAndAwardBadges(userId, questId);
       
     } catch (e) {
       print('Error completing quest: $e');
+      return [];
     }
   }
 
@@ -299,5 +302,48 @@ class SupabaseService {
       print('Error fetching badges: $e');
       return [];
     }
+  }
+
+  Future<List<Map<String, dynamic>>> checkAndAwardBadges(String userId, String completedQuestId) async {
+    List<Map<String, dynamic>> newBadges = [];
+    try {
+      // 1. Fetch User Stats
+      final completedCount = await getCompletedQuestCount(userId);
+      final badges = await getUserBadges(userId);
+      final ownedBadgeNames = badges.map((b) => b['badges']['name'] as String).toSet();
+
+      // 2. Fetch Completed Quest Details
+      final questResponse = await client.from('quests').select().eq('id', completedQuestId).single();
+      final String title = questResponse['title'] ?? '';
+      final String category = questResponse['category'] ?? '';
+
+      // 3. Define Logic
+      final Map<String, bool> eligibility = {
+        'Market Bull': completedCount >= 5,
+        'Crypto Scholar': title.contains('Bitcoin') || category == 'Crypto',
+        'Estate Tycoon': category == 'RealEstate',
+      };
+
+      // 4. Award Badges
+      for (final badgeName in eligibility.keys) {
+        if (eligibility[badgeName] == true && !ownedBadgeNames.contains(badgeName)) {
+           // Fetch Badge ID by Name
+           final badgeRes = await client.from('badges').select().eq('name', badgeName).maybeSingle();
+           
+           if (badgeRes != null) {
+              await client.from('user_badges').insert({
+                'user_id': userId,
+                'badge_id': badgeRes['id'],
+                'earned_at': DateTime.now().toIso8601String(),
+              });
+              print('BADGE AWARDED: $badgeName');
+              newBadges.add(badgeRes);
+           }
+        }
+      }
+    } catch (e) {
+      print('Error checking badges: $e');
+    }
+    return newBadges;
   }
 }

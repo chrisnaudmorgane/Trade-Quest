@@ -70,7 +70,8 @@ final appRouter = GoRouter(
          final topic = state.uri.queryParameters['topic'];
          final level = state.uri.queryParameters['level'];
          final questId = state.uri.queryParameters['questId'] ?? 'unknown';
-         return LessonEngineScreen(topic: topic, level: level, questId: questId);
+         final xpReward = int.tryParse(state.uri.queryParameters['xpReward'] ?? '100') ?? 100;
+         return LessonEngineScreen(topic: topic ?? 'Unknown', level: level ?? 'Beginner', questId: questId, xpReward: xpReward);
       },
     ),
     GoRoute(
