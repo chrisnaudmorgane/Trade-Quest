@@ -54,12 +54,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF16262E),
-        title: const Text('Update Username', style: TextStyle(color: Colors.white)),
+        title: const Text('Modifier Pseudo', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            hintText: 'Enter new username',
+            hintText: 'Nouveau pseudo',
             hintStyle: TextStyle(color: Colors.grey),
             enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: AppColors.primary)),
           ),
@@ -67,7 +67,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: const Text('Annuler', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () async {
@@ -80,7 +80,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 _loadProfile(); // Refresh
               }
             },
-            child: const Text('Save', style: TextStyle(color: AppColors.primary)),
+            child: const Text('Sauvegarder', style: TextStyle(color: AppColors.primary)),
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     // If loading, show loading or default, for now just default structure with loader potentially
     // but to keep UI stable we render valid structure
     
-    final username = _profile?['username'] ?? 'Ghost Agent';
+    final username = _profile?['username'] ?? 'Agent Fantôme';
     final email = SupabaseService().currentUser?.email ?? 'No Email';
     final avatarUrl = _profile?['avatar_url'] ?? 'https://lh3.googleusercontent.com/aida-public/AB6AXuDw8nIWuL1XVwEE2uCvx7oS4K2WCnygGmUBU4_UWiHF_2oMTn0nh8BaQzE_E9znTsnIVK4MIEhpIrW4wVsHtdT0xZ5S_HeLNwKL7lhSDOzqePu_v0tA85bFNyl3uNMc9Z7fL2us1S2KTWhHruz4OC2dhMINAScWtVRc8RkM9bfceJHj0gOZqZMOUgpq3D7Gsp8sn8JbD9Ps2XIwgYuL0tY8RhH5SvBxJ_06vgJGt5sAiHzuhFtzuvKKPou6bP346EdZHqWZYrm_qz1A';
 
@@ -140,42 +140,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         _buildProfileCard(username, email, avatarUrl),
                         const SizedBox(height: 24),
-                        _buildSectionHeader('Account Management'),
+                        _buildSectionHeader('Gestion du Compte'),
                         const SizedBox(height: 12),
                         _buildSettingsGroup([
                           _buildSettingsTile(
                             icon: Icons.badge,
-                            title: 'Personal Info',
+                            title: 'Infos Personnelles',
                             subtitle: email,
                             onTap: () {},
                           ),
-                          _buildSettingsTile(
-                            icon: Icons.language,
-                            title: 'Language / Langue',
-                            subtitle: Localizations.localeOf(context).languageCode == 'en' ? 'English' : 'Français',
-                            trailing: Text(
-                              Localizations.localeOf(context).languageCode == 'en' ? '🇺🇸' : '🇫🇷',
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                            onTap: () {
-                              ref.read(localeProvider.notifier).toggleLocale();
-                            },
-                          ),
                         ]),
                         const SizedBox(height: 24),
-                        _buildSectionHeader('Notification Preferences'),
+                        _buildSectionHeader('Préférences Notification'),
                         const SizedBox(height: 12),
                         _buildSettingsGroup([
                           _buildSwitchTile(
                             icon: Icons.school,
-                            title: 'Lesson Reminders',
+                            title: 'Rappel Leçons',
                             value: true,
                             onChanged: (v) {},
                             iconColor: AppColors.success,
                           ),
                           _buildSwitchTile(
                             icon: Icons.military_tech,
-                            title: 'XP Alerts',
+                            title: 'Alertes XP',
                             value: true,
                             onChanged: (v) {},
                             iconColor: AppColors.success,
@@ -183,12 +171,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ]),
                         const SizedBox(height: 24),
 
-                        _buildSectionHeader('Help & Support'),
+                        _buildSectionHeader('Aide & Support'),
                         const SizedBox(height: 12),
                         _buildSettingsGroup([
                           _buildSettingsTile(
                             icon: Icons.help,
-                            title: 'Support Center',
+                            title: 'Centre d\'Aide',
                             iconColor: const Color(0xFFA0AEC0),
                             trailingIcon: Icons.open_in_new,
                             onTap: () async {
@@ -207,28 +195,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           _buildSettingsTile(
                             icon: Icons.policy,
-                            title: 'Privacy & Terms',
+                            title: 'Confidentialité',
                             iconColor: const Color(0xFFA0AEC0),
                             onTap: () {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor: const Color(0xFF16262E),
-                                  title: const Text('Privacy Policy', style: TextStyle(color: Colors.white)),
+                                  title: const Text('Politique de Confidentialité', style: TextStyle(color: Colors.white)),
                                   content: const SingleChildScrollView(
                                     child: Text(
-                                      "We respect your privacy.\n\n"
-                                      "1. Data Collection: We collect your email and username for authentication and gamification (Leaderboards, XP).\n"
-                                      "2. AI Usage: Your 'Open Mic' topics are sent to Gemini AI for lesson generation. No personal data is shared with AI.\n"
-                                      "3. Analytics: We track lesson completion to improve the learning path.\n\n"
-                                      "Contact agossou@chrisnaud.com for data deletion requests.",
+                                      "Nous respectons ta vie privée.\n\n"
+                                      "1. Données : Email et Pseudo pour l'authentification et le classement.\n"
+                                      "2. IA : Tes sujets 'Micro Ouvert' sont anonymisés avant d'être envoyés à l'IA.\n"
+                                      "3. Contact : agossou@chrisnaud.com pour toute suppression.",
                                       style: TextStyle(color: Colors.white70),
                                     ),
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(context),
-                                      child: const Text('Close', style: TextStyle(color: AppColors.primary)),
+                                      child: const Text('Fermer', style: TextStyle(color: AppColors.primary)),
                                     ),
                                   ],
                                 ),
@@ -282,7 +269,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SYSTEM',
+                    'SYSTÈME',
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: 10,
@@ -291,7 +278,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                   const Text(
-                    'Settings',
+                    'Paramètres',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -583,7 +570,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const Icon(Icons.logout, color: AppColors.error, size: 20),
             const SizedBox(width: 8),
             const Text(
-              'Disconnect Session',
+              'Déconnexion',
               style: TextStyle(
                 color: AppColors.error,
                 fontWeight: FontWeight.bold,

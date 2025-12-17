@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/services/gemini_service.dart';
 import '../../../../core/services/supabase_service.dart';
+import '../../../../core/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,19 +19,39 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Map<String, dynamic>>> _questsFuture;
-  String _selectedCategory = 'All Quests';
+  String _selectedCategory = 'Toutes';
   Map<String, dynamic>? _profile;
   Set<String> _completedQuestIds = {};
   final TextEditingController _searchController = TextEditingController();
 
+  late final AppLifecycleListener _listener;
+
   @override
   void initState() {
     super.initState();
+    
+    // Clear notifications when user opens app
+    NotificationService().cancelAll();
+    
+    _listener = AppLifecycleListener(
+      onStateChange: _onStateChanged,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndRefreshQuests();
       _loadProfile();
       _checkOpenMicStatus();
     });
+  }
+
+  void _onStateChanged(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // User left app -> Schedule retention reminder
+      NotificationService().scheduleRetentionReminder();
+    } else if (state == AppLifecycleState.resumed) {
+      // User back -> Cancel reminders
+      NotificationService().cancelAll();
+    }
   }
 
   Future<void> _loadProfile() async {
@@ -151,6 +172,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final unlockDate = DateTime.now().add(const Duration(days: 3));
       await prefs.setString('open_mic_unlock_date', unlockDate.toIso8601String());
       await prefs.setInt('open_mic_attempts', 0);
+      
+      // Schedule Notification
+      await NotificationService().scheduleOpenMicReminder();
+      
       setState(() {
         _openMicAttempts = 0;
         _openMicUnlockDate = unlockDate;
@@ -165,6 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _listener.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -189,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF1E293B),
         title: Row(
           children: [
-            const Text('Open Mic 🎤', style: TextStyle(color: Colors.white)),
+            const Text('Micro Ouvert 🎤', style: TextStyle(color: Colors.white)),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -198,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '$_openMicAttempts left', 
+                '$_openMicAttempts restants', 
                 style: const TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)
               ),
             ),
@@ -208,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Ask the AI to teach you a specific financial concept.',
+              'Demande à l\'IA de t\'expliquer un concept financier.',
               style: TextStyle(color: Colors.white70, fontSize: 13),
             ),
             const SizedBox(height: 16),
@@ -216,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: controller,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'e.g. Short Selling, ETF, Greeks...',
+                hintText: 'ex: Vente à découvert, FNB, Options...',
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
                 filled: true,
                 fillColor: Colors.black26,
@@ -228,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child: const Text('Annuler', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -263,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.neonPurple),
-            child: const Text('Start Lesson', style: TextStyle(color: Colors.white)),
+            child: const Text('Lancer Leçon', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -310,8 +336,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                          Text(
-                            l10n.selectMission,
+                           Text(
+                            'Choisis ta Mission',
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -392,13 +418,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     children: [
-                      _buildChip('All Quests', isActive: _selectedCategory == 'All Quests', onTap: () => _onCategorySelected('All Quests')),
+                      _buildChip('Toutes', isActive: _selectedCategory == 'Toutes', onTap: () => _onCategorySelected('Toutes')),
                       _buildChip('Crypto', isActive: _selectedCategory == 'Crypto', onTap: () => _onCategorySelected('Crypto')),
-                      _buildChip('Stocks', isActive: _selectedCategory == 'Stocks', onTap: () => _onCategorySelected('Stocks')),
-                      _buildChip('RealEstate', isActive: _selectedCategory == 'RealEstate', onTap: () => _onCategorySelected('RealEstate')),
-                      _buildChip('Business', isActive: _selectedCategory == 'Business', onTap: () => _onCategorySelected('Business')),
-                      _buildChip('Psychology', isActive: _selectedCategory == 'Psychology', onTap: () => _onCategorySelected('Psychology')),
-                      _buildChip('Law', isActive: _selectedCategory == 'Law', onTap: () => _onCategorySelected('Law')),
+                      _buildChip('Bourse', isActive: _selectedCategory == 'Stocks', onTap: () => _onCategorySelected('Stocks')),
+                      _buildChip('Immobilier', isActive: _selectedCategory == 'RealEstate', onTap: () => _onCategorySelected('RealEstate')),
+                      _buildChip('Affaires', isActive: _selectedCategory == 'Business', onTap: () => _onCategorySelected('Business')),
+                      _buildChip('Psychologie', isActive: _selectedCategory == 'Psychology', onTap: () => _onCategorySelected('Psychology')),
+                      _buildChip('Droit', isActive: _selectedCategory == 'Law', onTap: () => _onCategorySelected('Law')),
                     ],
                   ),
                 ),
@@ -425,13 +451,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           
                           const SizedBox(height: 24),
                           
+
+                          
+                          const SizedBox(height: 24),
+                          
                           // "Available Quests" Header
                           Row(
                             children: [
                                Icon(Icons.grid_view, color: AppColors.neonPurple, size: 20),
                                const SizedBox(width: 8),
                                Text(
-                                 'Available Quests',
+                                 'Missions Disponibles',
                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                    fontWeight: FontWeight.bold,
                                    color: Colors.white,
@@ -468,8 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                  ).animate().fadeIn().slideX();
                               }).toList(),
                             ),
-                        ],
-                      );
+                          ],
+                        );
                     },
                   ),
                 ),
@@ -630,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   border: Border.all(color: AppColors.primary.withOpacity(0.2)),
                 ),
                 child: const Text(
-                  'FEATURED',
+                  'À LA UNE',
                   style: TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.bold,
@@ -670,7 +700,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      quest['description'] ?? 'Travel back to 2009. Mine the first block and learn the core of blockchain technology.',
+                      quest['description'] ?? 'Voyage en 2009. Mine le premier bloc et comprends la blockchain.',
                       style: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 12,
@@ -709,7 +739,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Text(
-                                  'Start Mission',
+                                  'Lancer Mission',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -827,7 +857,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        isCompleted ? 'Mission Accomplished' : subtitle,
+                        isCompleted ? 'Mission Accomplie' : subtitle,
                         style: TextStyle(
                           color: isCompleted ? AppColors.neonGreen : AppColors.textSecondary,
                           fontSize: 12,
@@ -889,7 +919,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Icon(Icons.bolt, color: isCompleted ? AppColors.textSecondary : AppColors.neonPurple, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        isLocked ? '??? XP' : (isCompleted ? 'Claimed' : '+$xp XP'),
+                        isLocked ? '??? XP' : (isCompleted ? 'Reçu' : '+$xp XP'),
                         style: TextStyle(
                           color: isLocked || isCompleted ? AppColors.textSecondary : Colors.white,
                           fontWeight: FontWeight.bold,

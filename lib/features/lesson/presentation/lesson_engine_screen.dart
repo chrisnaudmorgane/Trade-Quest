@@ -492,6 +492,20 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                              ),
                            ),
                            IconButton(
+                             onPressed: () {
+                               if (_lessonContent == null) return;
+                               // Share Lesson
+                               context.push('/share-achievement', extra: {
+                                  'type': 'lesson',
+                                  'data': {
+                                    'title': _lessonContent!.title,
+                                    'xp': widget.xpReward,
+                                  }
+                               });
+                             },
+                             icon: const Icon(Icons.share, color: AppColors.neonBlue),
+                           ),
+                           IconButton(
                              onPressed: () => context.go('/home'),
                              icon: const Icon(Icons.close, color: Colors.white70),
                            ),

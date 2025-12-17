@@ -12,6 +12,7 @@ import '../../features/leaderboard/presentation/leaderboard_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../core/services/supabase_service.dart';
 import '../../features/social/presentation/link_agents_screen.dart';
+import '../../features/social/presentation/share_achievement_screen.dart';
 import 'dart:async';
 
 final appRouter = GoRouter(
@@ -25,7 +26,6 @@ final appRouter = GoRouter(
       return '/home';
     }
     
-    // Optional: Protect other routes
     if (session == null && !isLoggingIn) return '/';
     
     return null; 
@@ -81,6 +81,16 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/solver',
       builder: (context, state) => const SolverScreen(),
+    ),
+    GoRoute(
+      path: '/share-achievement',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        return ShareAchievementScreen(
+          type: extra['type'] as String,
+          data: extra['data'] as Map<String, dynamic>,
+        );
+      },
     ),
   ],
 );

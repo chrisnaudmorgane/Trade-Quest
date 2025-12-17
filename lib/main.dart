@@ -8,6 +8,8 @@ import 'core/router/app_router.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/gemini_service.dart';
 import 'core/providers/locale_provider.dart';
+import 'core/services/notification_service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'dart:io';
 
 void main() async {
@@ -20,6 +22,9 @@ void main() async {
     url: 'https://pbhvmvnqdeplujtsaefk.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHZtdm5xZGVwbHVqdHNhZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTU4OTksImV4cCI6MjA4MDg3MTg5OX0.PhPd3m4msgjtUoE_xcHXTQk_i20OTs9yZSafmJ8I2Rs',
   );
+
+  await Firebase.initializeApp();
+  await NotificationService().initialize();
 
   // TODO: Replace with actual Gemini API Key
   GeminiService().initialize(apiKey: 'AIzaSyCc6SvJpVdotdUKX9zqpOYZOoqeZZZAweE');

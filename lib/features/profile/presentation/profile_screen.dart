@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trade_quest/core/theme/app_colors.dart';
@@ -55,39 +56,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  final ScreenshotController _screenshotController = ScreenshotController();
-
   Future<void> _shareProgress() async {
-    setState(() => _isLoading = true); // Show loading during capture
-
-    try {
-      final image = await _screenshotController.captureFromWidget(
-        _buildShareCard(),
-        delay: const Duration(milliseconds: 100),
-        pixelRatio: 3.0,
-      );
-
-      final directory = await getTemporaryDirectory();
-      final imagePath = await File('${directory.path}/tradequest_share.png').create();
-      await imagePath.writeAsBytes(image);
-
-      final xFile = XFile(imagePath.path);
-      
-      const shareText = 'Join me on TradeQuest and master the financial markets! 🚀\n\nDownload now: https://tradequest.app';
-
-      await Share.shareXFiles([xFile], text: shareText);
-
-    } catch (e) {
-      print('Error sharing: $e');
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    final username = _profile?['username'] ?? 'Fellow Trader';
+    final xp = _profile?['xp'] ?? 0;
+    final level = (xp <= 0) ? 1 : (sqrt(xp / 2500).floor()) + 1;
+    final rank = _profile?['calculated_rank'] ?? 0;
+    
+    // Pass data to new screen
+    context.push('/share-achievement', extra: {
+      'type': 'profile',
+      'data': {
+        'username': username,
+        'level': level,
+        'xp': xp,
+        'rank': rank,
+        'streak': _profile?['streak'] ?? 0,
+        'badges': _profile?['user_badges'] ?? [],
+      }
+    });
   }
 
   Widget _buildShareCard() {
     final username = _profile?['username'] ?? 'Fellow Trader';
     final xp = _profile?['xp'] ?? 0;
-    final level = (xp / 1000).floor() + 1;
+    final level = (xp <= 0) ? 1 : (sqrt(xp / 2500).floor()) + 1;
     final rank = _profile?['calculated_rank'] ?? 0;
     final streak = _profile?['streak'] ?? 0;
     final badges = _profile?['user_badges'] as List<Map<String, dynamic>>? ?? [];
@@ -120,7 +112,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'OPERATOR STATS',
+                    'IDENTITÉ',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'PROFIL OPÉRATEUR',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -163,7 +165,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'LEVEL $level STRATEGIST',
+                      'NIVEAU $level STRATÈGE',
                       style: const TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -177,8 +179,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildShareStat('STREAK', '$streak Days', Icons.local_fire_department, Colors.amber),
-              _buildShareStat('RANK', '#$rank', Icons.leaderboard, AppColors.success),
+              _buildShareStat('SÉRIE', '$streak Jours', Icons.local_fire_department, Colors.amber),
+              _buildShareStat('RANG', '#$rank', Icons.leaderboard, AppColors.success),
               _buildShareStat('BADGES', '${badges.length}', Icons.military_tech, AppColors.neonPurple),
             ],
           ),
@@ -186,17 +188,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 32),
           Divider(color: Colors.white.withOpacity(0.1)),
           const SizedBox(height: 16),
-           Row(
-             mainAxisAlignment: MainAxisAlignment.center,
-             children: [
-               Icon(Icons.download, color: Colors.white70, size: 16),
-               SizedBox(width: 8),
-               Text(
-                 'Play Free at tradequest.app',
-                 style: TextStyle(color: Colors.white70, fontSize: 12),
-               ),
-             ],
-           )
+             Row(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Icon(Icons.download, color: Colors.white70, size: 16),
+                 SizedBox(width: 8),
+                 Text(
+                   'Joue Gratuitement sur tradequest.app',
+                   style: TextStyle(color: Colors.white70, fontSize: 12),
+                 ),
+               ],
+             )
         ],
       ),
     );
@@ -289,7 +291,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           Column(
             children: [
               Text(
-                'IDENTITY',
+                'IDENTITÉ',
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: 10,
@@ -298,7 +300,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
               const Text(
-                'Operator Profile',
+                'Profil Opérateur',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -319,9 +321,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _buildProfileHeader() {
     final username = _profile?['username'] ?? 'Unknown Agent';
     final xp = _profile?['xp'] ?? 0;
-    final level = (xp / 1000).floor() + 1;
-    final nextLevelXp = level * 1000;
-    final progress = (xp % 1000) / 1000;
+    final level = (xp <= 0) ? 1 : (sqrt(xp / 2500).floor()) + 1;
+    // XP for next level L+1: 2500 * (L)^2
+    final nextLevelXp = (2500 * pow(level, 2)).toInt();
+    
+    // XP for current level L: 2500 * (L-1)^2
+    final currentLevelBaseXp = (2500 * pow(level - 1, 2)).toInt();
+    
+    final progress = (xp - currentLevelBaseXp) / (nextLevelXp - currentLevelBaseXp);
     final xpToNext = nextLevelXp - xp;
 
     return Column(
@@ -364,7 +371,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const Text(
-          'FINANCIAL STRATEGIST CLASS',
+          'CLASSE STRATÈGE FINANCIER',
           style: TextStyle(color: Color(0xFF315668), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, fontFamily: 'monospace'),
         ),
         const SizedBox(height: 16),
@@ -380,7 +387,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Current XP', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  const Text('XP Actuel', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
                   RichText(
                     text: TextSpan(
                       children: [
@@ -404,7 +411,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 8),
               Align(
                  alignment: Alignment.centerLeft,
-                 child: Text('$xpToNext XP to Level ${level + 1}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                 child: Text('$xpToNext XP vers Niveau ${level + 1}', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
               ),
             ],
           ),
@@ -431,7 +438,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const Icon(Icons.share, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
                 const Text(
-                  'SHARE PROGRESS', 
+                  'PARTAGER PROGRÈS', 
                   style: TextStyle(
                     color: Colors.white, 
                     fontWeight: FontWeight.bold, 
@@ -454,11 +461,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Row(
       children: [
-        _buildStatItem(Icons.local_fire_department, '$streak', 'Day Streak', Colors.amber),
+        _buildStatItem(Icons.local_fire_department, '$streak', 'Série (Jours)', Colors.amber),
         const SizedBox(width: 8),
-        _buildStatItem(Icons.verified_user, '$questCount', 'Quests Done', AppColors.success),
+        _buildStatItem(Icons.verified_user, '$questCount', 'Quêtes Terminées', AppColors.success),
         const SizedBox(width: 8),
-        _buildStatItem(Icons.leaderboard, '#$rank', 'Global Rank', AppColors.primary),
+        _buildStatItem(Icons.leaderboard, '#$rank', 'Rang Global', AppColors.primary),
       ],
     );
   }
@@ -496,10 +503,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
            ],
         ),
         if (onMore != null)
-           GestureDetector(
-             onTap: onMore,
-             child: Text('View All', style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)),
-           ),
+             GestureDetector(
+               onTap: onMore,
+               child: Text('Voir Tout', style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)),
+             ),
       ],
     );
   }
@@ -600,7 +607,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Icon(Icons.history_edu, color: const Color(0xFF64748B), size: 40),
             const SizedBox(height: 12),
             const Text(
-              'No missions logged yet.',
+              'Aucune mission enregistrée.',
               style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
             ),
           ],
@@ -631,8 +638,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           padding: const EdgeInsets.only(bottom: 12.0),
           child: _buildQuestItem(
             icon: iconData,
-            title: questData['title'] ?? 'Unknown Mission',
-            subtitle: questData['category'] ?? 'General',
+            title: questData['title'] ?? 'Mission Inconnue',
+            subtitle: questData['category'] ?? 'Général',
             xp: '+${questData['xp'] ?? 0} XP',
             status: status,
             time: '',

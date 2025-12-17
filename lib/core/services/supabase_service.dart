@@ -149,7 +149,7 @@ class SupabaseService {
       // Filter by language
       query = query.eq('language', language);
 
-      if (category != null && category != 'All Quests') {
+      if (category != null && category != 'All Quests' && category != 'Toutes') {
         query = query.eq('category', category);
       }
       
