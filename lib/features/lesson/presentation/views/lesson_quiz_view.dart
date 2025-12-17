@@ -5,9 +5,9 @@ import '../../domain/lesson_models.dart';
 
 class LessonQuizView extends StatefulWidget {
   final LessonScreen screen;
-  final VoidCallback onNext;
+  final void Function(bool isCorrect, String? feedback) onResult; // Changed for pass/fail/feedback logic
 
-  const LessonQuizView({super.key, required this.screen, required this.onNext});
+  const LessonQuizView({super.key, required this.screen, required this.onResult});
 
   @override
   State<LessonQuizView> createState() => _LessonQuizViewState();
@@ -32,9 +32,17 @@ class _LessonQuizViewState extends State<LessonQuizView> {
     });
   }
 
+  final TextEditingController _feedbackController = TextEditingController();
+
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final question = widget.screen.question ?? 'Question?';
+    final question = widget.screen.question ?? 'Question ?';
     final options = widget.screen.options ?? [];
 
     return SingleChildScrollView(
@@ -91,7 +99,7 @@ class _LessonQuizViewState extends State<LessonQuizView> {
                   const Icon(Icons.smart_toy, size: 14, color: Color(0xFF90b7cb)),
                   const SizedBox(width: 6),
                   const Text(
-                    'INTERACTIVE CHECK',
+                    'VÉRIFICATION INTERACTIVE',
                     style: TextStyle(
                       color: Color(0xFF90b7cb),
                       fontSize: 10,
@@ -209,7 +217,7 @@ class _LessonQuizViewState extends State<LessonQuizView> {
               );
             }),
 
-            const SizedBox(height: 32), // Replaced Spacer with specific spacing
+            const SizedBox(height: 32),
 
             // Feedback Card (Shows ONLY after submission)
             if (_isSubmitted)
@@ -251,16 +259,18 @@ class _LessonQuizViewState extends State<LessonQuizView> {
                                 child: const Icon(Icons.lightbulb, color: AppColors.primary),
                               ),
                               const SizedBox(width: 16),
-                              const Expanded(
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Analysis Complete',
+                                      'Analyse Terminée',
                                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                                     ),
                                     Text(
-                                      'Correct! Well done.', // Simplified feedback for V2
+                                      (_selectedOptionIndex == _correctOptionIndex) 
+                                          ? 'Correct ! Bien joué.' 
+                                          : 'Pas tout à fait. Explique-moi pourquoi, je t\'aiderai !',
                                       style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
                                     ),
                                   ],
@@ -269,21 +279,60 @@ class _LessonQuizViewState extends State<LessonQuizView> {
                             ],
                           ),
                           const SizedBox(height: 16),
+                          
+                          // Optional Feedback Input (Only if WRONG)
+                          if (_selectedOptionIndex != _correctOptionIndex)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Aide le Mentor : Dis-lui ce que tu n'as pas compris (mot difficile, analogie floue...) pour qu'il adapte la suite.",
+                                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontStyle: FontStyle.italic),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextField(
+                                    controller: _feedbackController,
+                                    style: const TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                      hintText: "Ex : Je n'ai pas compris l'effet de levier...",
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14),
+                                      filled: true,
+                                      fillColor: Colors.black.withOpacity(0.3),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
                           ElevatedButton(
-                            onPressed: widget.onNext,
+                            onPressed: () {
+                              final isCorrect = _selectedOptionIndex == _correctOptionIndex;
+                              final feedback = _feedbackController.text.isNotEmpty ? _feedbackController.text : null;
+                              widget.onResult(isCorrect, feedback);
+                            },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: AppColors.backgroundDark,
+                              backgroundColor: (_selectedOptionIndex == _correctOptionIndex) ? AppColors.primary : AppColors.error,
+                              foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 48),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 0,
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Next Challenge', style: TextStyle(fontWeight: FontWeight.bold)),
-                                SizedBox(width: 8),
-                                Icon(Icons.arrow_forward),
+                                Text(
+                                  (_selectedOptionIndex == _correctOptionIndex) ? 'MISSION SUIVANTE' : 'REVOIR CONCEPT', 
+                                  style: const TextStyle(fontWeight: FontWeight.bold)
+                                ),
+                                const SizedBox(width: 8),
+                                Icon((_selectedOptionIndex == _correctOptionIndex) ? Icons.arrow_forward : Icons.refresh),
                               ],
                             ),
                           ),

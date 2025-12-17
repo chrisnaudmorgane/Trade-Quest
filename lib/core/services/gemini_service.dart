@@ -85,7 +85,12 @@ class GeminiService {
     - Sujet : "$topic"
     - Niveau : "$level"
     
-    RETURN ONLY JSON. NO MARKDOWN.
+    ### STRUCTURE REQUISE (OBLIGATOIRE)
+    - **Minimum 5 Écrans de Contenu**.
+    - **Tu DOIS inclure 4 'interactive_check' (Quiz Intermédiaires)** répartis intelligemment dans la leçon.
+    - Le dernier élément est le 'final_quiz' (Le 5ème test).
+    
+    RETURN ONLY JSON. NO MARKDOWN. TOUT LE CONTENU DOIT ÊTRE EN FRANÇAIS.
     ''';
 
     try {
@@ -108,6 +113,70 @@ class GeminiService {
             "content": "Could not generate content. Please check API key."
           }
         ]
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> generateRemedialLesson(String topic, String level, {String? userFeedback}) async {
+    if (!_isInitialized) throw Exception('GeminiService not initialized');
+
+    final feedbackContext = userFeedback != null && userFeedback.isNotEmpty
+        ? "FEEDBACK UTILISATEUR (Pourquoi j'ai échoué) : \"$userFeedback\". TIENS-EN COMPTE POUR L'EXPLICATION."
+        : "Pas de feedback utilisateur.";
+
+    final prompt = '''
+    ### ROLE: Moteur de Réparation Pédagogique
+    L'utilisateur a ÉCHOUÉ le quiz sur : "$topic" ($level).
+    $feedbackContext
+    
+    ### MISSION
+    4.  **Re-Test** : Génère une NOUVELLE structure de leçon de rattrapage.
+    
+    ### STRUCTURE REQUISE POUR LE RATTRAPAGE
+    - **Minimum 4 Écrans**.
+    - **Tu DOIS inclure 3 'interactive_check' (Quiz Intermédiaires)** avant le Final Quiz.
+    - Le 4ème test est le 'final_quiz'.
+    
+    ### STRUCTURE JSON (Stricte)
+    {
+      "response_type": "lesson",
+      "praise_or_scold": "T'inquiète, on va reprendre ça tranquillement.",
+      "content": {
+        "lesson_id": "remedial_1",
+        "title": "$topic (Revue)",
+        "screens": [
+          {
+             "type": "theory_balanced",
+             "text_content": "Explication ultra-simple (max 200 chars).",
+             "analogy_highlight": "Nouvelle analogie simple (ex: Pizza, Football, Jardinage).",
+             "visual_description": "Description visuelle simple."
+          }
+        ],
+        "final_quiz": {
+          "question": "Nouvelle Question Plus Simple",
+          "options": ["A", "B", "C"],
+          "correct_idx": 0,
+          "retry_on_fail": false
+        }
+      }
+    }
+    
+    RETURN ONLY JSON. TOUT LE CONTENU DOIT ÊTRE EN FRANÇAIS.
+    ''';
+
+    try {
+      final content = [Content.text(prompt)];
+      final response = await _model.generateContent(content);
+      final responseText = response.text;
+
+      if (responseText == null) throw Exception('Empty response from AI');
+
+      return jsonDecode(_extractJson(responseText));
+    } catch (e) {
+      print('Remedial Generation Error: $e');
+      return {
+        "title": "Retry",
+        "content": null
       };
     }
   }

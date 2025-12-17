@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:trade_quest/l10n/generated/app_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -353,13 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             children: [
                               Text(
-                                '${l10n.level} ${((_profile?['xp'] ?? 0) / 1000).floor() + 1}',
-                                style: const TextStyle(
-                                  color: AppColors.neonPurple,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
+                                '${l10n.level} ${_calculateLevel(_profile?['xp'] ?? 0)}'),
                               const SizedBox(width: 8),
                               Container(
                                 width: 32,
@@ -537,14 +532,26 @@ class _HomeScreenState extends State<HomeScreen> {
     final int userXp = _profile!['xp'] as int? ?? 0;
     final String tag = quest['tag'] ?? 'Beginner';
     
-    // Simple progression logic
+    // Quadratic thresholds: XP = 2500 * (Level-1)^2
+    // Level 2 (Intermediate) = 2500 XP
+    // Level 3 (Expert) = 10000 XP
+    // Level 4 (Entrepreneur) = 22500 XP
+    // Level 5 (Legendary) = 40000 XP
+    
     if (tag == 'Beginner') return false;
-    if (tag == 'Intermediate') return userXp < 300;
-    if (tag == 'Expert') return userXp < 1000;
-    if (tag == 'Entrepreneur') return userXp < 2000;
-    if (tag == 'Legendary') return userXp < 5000;
+    if (tag == 'Intermediate') return userXp < 2500;
+    if (tag == 'Expert') return userXp < 10000;
+    if (tag == 'Entrepreneur') return userXp < 22500;
+    if (tag == 'Legendary') return userXp < 40000;
     
     return false;
+  }
+
+  int _calculateLevel(int xp) {
+    if (xp <= 0) return 1;
+    // Formula: Level = floor(sqrt(XP / 2500)) + 1
+    // L1 = 0-2499, L2 = 2500-9999, etc.
+    return (sqrt(xp / 2500).floor()) + 1;
   }
 
   Widget _buildChip(String label, {bool isActive = false, VoidCallback? onTap}) {

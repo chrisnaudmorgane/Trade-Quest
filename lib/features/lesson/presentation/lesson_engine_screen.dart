@@ -6,7 +6,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../domain/lesson_models.dart';
 import 'views/lesson_content_view.dart';
 import 'views/lesson_quiz_view.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class LessonEngineScreen extends StatefulWidget {
@@ -130,15 +129,14 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
   Future<void> _completeLesson() async {
       setState(() => _isCompleted = true);
       
-      // Play Success Sound
+      /* Sound Removed by User Request
       final player = AudioPlayer();
-      // Note: User needs to add assets/sounds/success.mp3
       try {
         await player.play(AssetSource('sounds/success_quest.mp3'));
       } catch (e) {
-        print('Audio error: $e'); 
-        // Fail silently if asset missing
+        // print('Audio error: $e'); 
       }
+      */
 
       final user = SupabaseService().currentUser;
       if (user != null) {
@@ -180,18 +178,18 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("NEW BADGE UNLOCKED!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              const Text("NOUVEAU BADGE DÉBLOQUÉ !", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 24),
               Icon(Icons.military_tech, size: 80, color: Color(int.parse(badge['color_hex'] ?? '0xFFFFC107'))).animate().scale(duration: 600.ms, curve: Curves.elasticOut).then().shimmer(),
               const SizedBox(height: 16),
               Text(
-                badge['name'] ?? 'Unknown Badge',
+                badge['name'] ?? 'Badge Inconnu',
                 style: const TextStyle(color: AppColors.neonRoot, fontSize: 24, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
-                badge['description'] ?? 'You are a legend.',
+                badge['description'] ?? 'Tu deviens une légende.',
                 style: const TextStyle(color: Colors.white70),
                 textAlign: TextAlign.center,
               ),
@@ -199,7 +197,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.neonRoot),
-                child: const Text("CLAIM REWARD", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                child: const Text("RÉCUPÉRER", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               )
             ],
           ),
@@ -207,11 +205,12 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
       ),
     );
     
-    // Play Badge Sound
+    /* Sound Removed by User Request
     final player = AudioPlayer();
     try {
        player.play(AssetSource('sounds/badge_unlock.mp3'));
     } catch (_) {}
+    */
   }
 
   void _previousPage() {
@@ -248,7 +247,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
             children: [
                CircularProgressIndicator(color: AppColors.primary),
                SizedBox(height: 16),
-               Text("Connecting to AI Core...", style: TextStyle(color: Colors.white54)),
+               Text("Connexion au Cerveau IA...", style: TextStyle(color: Colors.white54)),
             ],
           ),
         ),
@@ -267,7 +266,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                 const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                 const SizedBox(height: 16),
                 Text(
-                  _error ?? "Signal Lost", 
+                  _error ?? "Signal Perdu", 
                   style: const TextStyle(color: Colors.white, fontSize: 16), 
                   textAlign: TextAlign.center
                 ),
@@ -275,7 +274,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                 ElevatedButton(
                   onPressed: () => context.go('/home'),
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                  child: const Text("Return to Base"),
+                  child: const Text("Retour à la Base"),
                 )
               ],
             ),
@@ -295,7 +294,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
               const Icon(Icons.block, color: AppColors.error, size: 48),
               const SizedBox(height: 16),
               Text(
-                _aiResponse!.responseType == 'refusal' ? 'Access Denied' : 'Preview Locked',
+                _aiResponse!.responseType == 'refusal' ? 'Accès Refusé' : 'Aperçu Verrouillé',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),
               ),
               const SizedBox(height: 8),
@@ -310,7 +309,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => context.go('/home'),
-                child: const Text('Back to Dashboard'),
+                child: const Text('Retour au Dashboard'),
               ),
             ],
           ),
@@ -328,7 +327,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
               const Icon(Icons.check_circle_outline, color: AppColors.success, size: 80),
               const SizedBox(height: 24),
               const Text(
-                'MISSION ACCOMPLISHED',
+                'MISSION ACCOMPLIE',
                 style: TextStyle(color: AppColors.success, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 2),
               ),
               const SizedBox(height: 16),
@@ -343,7 +342,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 ),
-                child: const Text('RETURN TO BASE', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                child: const Text('RETOUR BASE', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ],
           ),
@@ -374,7 +373,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                     children: [
                        IconButton(onPressed: () => context.go('/home'), icon: const Icon(Icons.close, color: Colors.white)),
                        const Spacer(),
-                       const Text("FINAL BOSS", style: TextStyle(color: AppColors.neonPurple, fontWeight: FontWeight.bold, letterSpacing: 2)),
+                       const Text("BOSS FINAL", style: TextStyle(color: AppColors.neonPurple, fontWeight: FontWeight.bold, letterSpacing: 2)),
                        const Spacer(),
                        const SizedBox(width: 48),
                     ],
@@ -383,7 +382,7 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                Expanded(
                  child: LessonQuizView(
                    screen: finalQuizScreen, 
-                   onNext: _completeLesson,
+                   onResult: (isCorrect, feedback) => _handleQuizResult(isCorrect, feedback, isFinal: true),
                  ),
                ),
             ],
@@ -521,7 +520,10 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
                           },
                         );
                       } else if (screen.type == 'interactive_check') {
-                        return LessonQuizView(screen: screen, onNext: _nextPage); // Updated prop logic needed in View
+                        return LessonQuizView(
+                          screen: screen, 
+                          onResult: (isCorrect, feedback) => _handleQuizResult(isCorrect, feedback, isFinal: false),
+                        );
                       }
                       return const Center(child: Text("Unknown Screen Type"));
                     },
@@ -533,5 +535,83 @@ class _LessonEngineScreenState extends State<LessonEngineScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _handleQuizResult(bool isCorrect, String? feedback, {bool isFinal = false}) async {
+     if (isCorrect) {
+       if (isFinal) {
+         await _completeLesson();
+       } else {
+         _nextPage();
+       }
+     } else {
+       // TRIGGER REMEDIAL LOOP
+       setState(() {
+         _isLoading = true;
+         // _showFinalQuiz = false; // logic handled by state reset below
+       });
+       
+       try {
+          final data = await GeminiService().generateRemedialLesson(
+             widget.topic, 
+             widget.level,
+             userFeedback: feedback
+          );
+          
+          if (data.containsKey('error') || data['content'] == null) {
+             throw Exception("Remedial Generation Failed");
+          }
+
+          final contentData = data['content'];
+          final List<dynamic> screensJson = contentData['screens'] ?? [];
+          
+          final screens = screensJson.map<LessonScreen>((s) {
+            return LessonScreen(
+              type: s['type'] ?? 'theory_balanced',
+              textContent: s['text_content'],
+              analogyHighlight: s['analogy_highlight'],
+              visualDescription: s['visual_description'],
+              question: s['question'],
+              options: s['options'] != null ? List<String>.from(s['options']) : null,
+              correctIdx: s['correct_idx'],
+            );
+          }).toList();
+
+          final newContent = LessonContent(
+             lessonId: contentData['lesson_id'] ?? 'remedial',
+             title: "${_lessonContent?.title ?? widget.topic} (Review)",
+             screens: screens,
+             finalQuiz: FinalQuiz(
+               question: contentData['final_quiz']['question'],
+               options: List<String>.from(contentData['final_quiz']['options']),
+               correctIdx: contentData['final_quiz']['correct_idx'],
+               retryOnFail: false,
+             ),
+          );
+
+          if (mounted) {
+             setState(() {
+               _lessonContent = newContent;
+               _currentPage = 0;
+               _showFinalQuiz = false; // Reset finding queen logic
+               _isLoading = false;
+               // Prompt user
+               ScaffoldMessenger.of(context).showSnackBar(
+                 const SnackBar(
+                   content: Text("IA: Simplifions ça. Revue activée."),
+                   backgroundColor: AppColors.neonPurple,
+                 )
+               );
+             });
+             _pageController.jumpToPage(0);
+          }
+
+       } catch (e) {
+          if (mounted) {
+             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur de Calibrage: $e")));
+             setState(() => _isLoading = false);
+          }
+       }
+     }
   }
 }
