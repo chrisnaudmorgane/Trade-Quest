@@ -2,6 +2,38 @@
 
 Welcome to **Trade Quest**! A gamified, AI-powered trading education application built with Flutter. Our mission is to make learning how to trade engaging, interactive, and socially driven.
 
+## 📱 App Previews & Features
+
+### 1. Welcome to TradeQuest
+*The gateway to your trading education journey. This onboarding screen introduces users to the core mechanics of the app, setting a professional and engaging tone right from the start.*
+<p align="center">
+  <img src="https://lh3.googleusercontent.com/aida/AP1WRLvGRL98yBTCs7_MxINfYEo5o__tDaDn9VHhCm_HSzCgjzIBQb1Pq-9X8ggkFh7r4uSXnvsGYZrdX1Cg_DOlsHt7KO8UOWEBEdbrNdqzTc3A5tH-GkBCLp3808gSriLj9xowq7gAbUigdHFcDhStqBadrt2b_YzPX91qRpO1f4IMvFbGWZAIryXiBzugJk1_lbDpXJY8qRGq9XUJyqouOnG3ll7pWgupaVxbS14abbBPrSBrLDgX19cxY-fn" width="250" alt="Welcome to TradeQuest" />
+</p>
+
+### 2. Lesson Flow & Mission Selection
+*Navigate through diverse trading topics. The mission interface allows users to pick their path—whether it's Crypto, Stocks, or Forex—providing clear progression and XP rewards.*
+<p align="center">
+  <img src="https://lh3.googleusercontent.com/aida/AP1WRLvzcB5hYMh7PFy6VmUqFaBsDuuhGT_Kwt5SWJIX5gs1-a9Ui0IRMISJPeCZPRwqEwGWMBPTBR1Kx7xc5eqOtin90pTLmT2tojhd8NjVlwZq3a0nEPkmW8c4KZgJRtNEMoafC9-dnlgkKdJYPEEVoQyw0WCEa0wK-zNf9p309vn4pfR8y7XkF_h1syPKx0PLY-NlkY77_Bachh34acWpNYmwvM7j1X3zSM2-peKxoxEuziWcNa5z7UZO0LZL" width="250" alt="Lesson Flow Interface" />
+</p>
+
+### 3. Quiz & Interaction
+*Put your knowledge to the test. Interactive quizzes reinforce learning with real-time feedback and AI-driven hints to ensure deep understanding of complex financial concepts.*
+<p align="center">
+  <img src="https://lh3.googleusercontent.com/aida/AP1WRLvQ9EOS4aGEOx4U6u7rFkJnOP-yC-7Ald_8poYAocze1j99q7CxVn0aOwYD-RQroIWdFwvz2qCZhjkP5lNI9fzfogG35fkO8-VDXks2U-NGzorcmnvObW4ZHhLujE96NwTYSovUSkz5JYoQh0zYYmCrGtMnKfmW5iZiMCCS7lJIniz_dg-SmzSdhI4RW4nIatG6cCU65kD6nlTYohVyYyRJcl7teqiqWeldExuXCpodaINf1emSAhqGhQG3" width="250" alt="Quiz & Interaction" />
+</p>
+
+### 4. Global Leaderboard
+*Compete and climb the ranks! The leaderboard fosters a healthy, competitive environment by showcasing top traders and their XP, encouraging continuous learning and engagement.*
+<p align="center">
+  <img src="https://lh3.googleusercontent.com/aida/AP1WRLvv--aGw5TZUqg6OQ6A3amYPdOiGJ2LZokoWTtGjSK7KMeVlZtdVQ5_EJnJEfNm73pgsj9X3oMqKe8oxqDHOXJXuTxK-_3lA-tIGF1cgLO5f6utkFR4XDQaBicApaaDmUccHbrrl6kufHSMYR2O3HaLXjW6SyjZbFv4IZiFlbY5MjOCeq3nA856Ot1tvtiPRHLGh6HeCS9U-aHFEVPp7blnOkm60cXKPlUUBTQHlnM-pIUW6bXqKdOkR_k" width="250" alt="Global Leaderboard" />
+</p>
+
+### 5. Share Achievement
+*Show off your progress. A beautifully designed achievement screen that users can easily share on social networks to celebrate their trading milestones and invite friends.*
+<p align="center">
+  <img src="https://lh3.googleusercontent.com/aida/AP1WRLsqXUmuOe4Bk2DMoTgQQMte-UqHg1l0pLriL7Vsl8PqzI9xLn8osybL077EWY-x8xKtM72bI7APpmgC2Jx2voUOCCAf7go7_JZERlmm831_578GepS-_eROrvNSV20JOb5tdCJcaoKnZhAg3VqvrbmX0_EX5l8Rnrr21BG5G1Q6Epe9moKaTHMg_vZsea6HQ_OhzlgdUuFb7JcqMnNYilRde58MeBB4dWaSgwjBbQgGoK96EwFAO8yklpZD" width="250" alt="Share Achievement" />
+</p>
+
 ## 🚀 Features
 
 - **Gamified Learning**: Complete trading lessons and quests to level up.
