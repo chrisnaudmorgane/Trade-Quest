@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Secrets / environment config (never commit real keys)
+env.json
+.env
+
+# Local Dart/Flutter DevTools state
+devtools_options.yaml

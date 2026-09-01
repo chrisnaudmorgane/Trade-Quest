@@ -320,6 +320,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildProfileHeader() {
     final username = _profile?['username'] ?? 'Unknown Agent';
+    final avatarUrl = _profile?['avatar_url'] as String?;
     final xp = _profile?['xp'] ?? 0;
     final level = (xp <= 0) ? 1 : (sqrt(xp / 2500).floor()) + 1;
     // XP for next level L+1: 2500 * (L)^2
@@ -347,7 +348,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20),
                 ],
               ),
-              child: const Icon(Icons.face_6, size: 60, color: Color(0xFFE2E8F0)),
+              clipBehavior: Clip.antiAlias,
+              child: avatarUrl != null && avatarUrl.isNotEmpty
+                  ? Image.network(
+                      avatarUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.face_6, size: 60, color: Color(0xFFE2E8F0)),
+                    )
+                  : const Icon(Icons.face_6, size: 60, color: Color(0xFFE2E8F0)),
             ),
              Positioned(
               bottom: 0,

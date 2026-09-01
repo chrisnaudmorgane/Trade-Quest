@@ -12,22 +12,44 @@ import 'core/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:io';
 
+const String _supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+const String _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  
-  // Initialize Services
-  // TODO: Replace with your actual Supabase URL and Anon Key
-  await SupabaseService().initialize(
-    url: 'https://pbhvmvnqdeplujtsaefk.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBiaHZtdm5xZGVwbHVqdHNhZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTU4OTksImV4cCI6MjA4MDg3MTg5OX0.PhPd3m4msgjtUoE_xcHXTQk_i20OTs9yZSafmJ8I2Rs',
+
+  assert(
+    _supabaseUrl.isNotEmpty && _supabaseAnonKey.isNotEmpty && _geminiApiKey.isNotEmpty,
+    'Missing SUPABASE_URL / SUPABASE_ANON_KEY / GEMINI_API_KEY. '
+    'Run with --dart-define-from-file=env.json (see env.example.json).',
   );
+
+  // Initialize Services
+  await SupabaseService().initialize(
+    url: _supabaseUrl,
+    anonKey: _supabaseAnonKey,
+  );
+
+  // Create the `profiles` row on first sign-in (and on every subsequent
+  // sign-in, as a no-op upsert) so username/avatar are never empty.
+  SupabaseService().client.auth.onAuthStateChange.listen((data) {
+    final user = data.session?.user;
+    if (user == null) return;
+    final metadata = user.userMetadata ?? {};
+    SupabaseService().ensureProfileExists(
+      userId: user.id,
+      email: user.email ?? '',
+      username: metadata['full_name'] as String? ?? metadata['name'] as String?,
+      avatarUrl: metadata['avatar_url'] as String? ?? metadata['picture'] as String?,
+    );
+  });
 
   await Firebase.initializeApp();
   await NotificationService().initialize();
 
-  // TODO: Replace with actual Gemini API Key
-  GeminiService().initialize(apiKey: 'AIzaSyCc6SvJpVdotdUKX9zqpOYZOoqeZZZAweE');
+  GeminiService().initialize(apiKey: _geminiApiKey);
 
   runApp(const ProviderScope(child: TradeQuestApp()));
 }
