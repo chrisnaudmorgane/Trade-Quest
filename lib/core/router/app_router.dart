@@ -18,17 +18,21 @@ import 'dart:async';
 final appRouter = GoRouter(
   initialLocation: '/',
   refreshListenable: GoRouterRefreshStream(SupabaseService().client.auth.onAuthStateChange),
-  redirect: (context, state) {
+  redirect: (context, state) async {
     final session = SupabaseService().currentUser;
-    final isLoggingIn = state.uri.path == '/login' || state.uri.path == '/';
-    
-    if (session != null && isLoggingIn) {
-      return '/home';
+    final isPublicPath = state.uri.path == '/login' || state.uri.path == '/';
+
+    if (session == null) {
+      return isPublicPath ? null : '/';
     }
-    
-    if (session == null && !isLoggingIn) return '/';
-    
-    return null; 
+
+    if (isPublicPath) {
+      final profile = await SupabaseService().getProfile(session.id);
+      final needsOnboarding = profile == null || profile['knowledge_level'] == null;
+      return needsOnboarding ? '/onboarding' : '/home';
+    }
+
+    return null;
   },
   routes: [
     GoRoute(

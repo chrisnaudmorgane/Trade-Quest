@@ -10,7 +10,6 @@ import 'core/services/gemini_service.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'dart:io';
 
 const String _supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 const String _supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
@@ -18,7 +17,6 @@ const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
 
   assert(
     _supabaseUrl.isNotEmpty && _supabaseAnonKey.isNotEmpty && _geminiApiKey.isNotEmpty,
@@ -78,13 +76,5 @@ class TradeQuestApp extends ConsumerWidget {
       ],
       locale: locale,
     );
-  }
-}
-
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
